@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Deployments from './pages/Deployments';
 import Databases from './pages/Databases';
 import Docker from './pages/Docker';
+import AIAssistant from './pages/AIAssistant';
 import Dashboard from './pages/Dashboard';
 import Monitoring from './pages/Monitoring';
 import Settings from './pages/Settings';
@@ -73,6 +74,7 @@ function App() {
               <Route path="/deployments" element={<Deployments />} />
               <Route path="/databases" element={<Databases />} />
               <Route path="/docker" element={<Docker />} />
+              <Route path="/ai" element={<AIAssistant />} />
               <Route path="/monitoring" element={<Monitoring />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/" />} />
@@ -92,6 +94,7 @@ function Sidebar() {
     { path: '/deployments', icon: 'fa-server', text: '部署实例' },
     { path: '/databases', icon: 'fa-database', text: '数据库' },
     { path: '/docker', icon: 'fa-box', text: 'Docker容器' },
+    { path: '/ai', icon: 'fa-robot', text: '数字员工' },
     { path: '/monitoring', icon: 'fa-chart-line', text: '监控告警' },
     { path: '/settings', icon: 'fa-cog', text: '系统设置' },
   ];

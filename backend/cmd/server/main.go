@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -335,6 +337,93 @@ func main() {
 
 		api.GET("/monitor/alerts", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"alerts": []gin.H{}})
+		})
+
+		// 数字员工 AI 对话 APIs
+		api.POST("/ai/chat", func(c *gin.Context) {
+			var req struct {
+				SessionID string `json:"session_id"`
+				UserID    string `json:"user_id"`
+				Message   string `json:"message" binding:"required"`
+			}
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+
+			sessionID := req.SessionID
+			if sessionID == "" {
+				sessionID = uuid.New().String()
+			}
+
+			// 模拟 AI 响应
+			intent := "general"
+			msg := strings.ToLower(req.Message)
+
+			var response string
+			if strings.Contains(msg, "你好") || strings.Contains(msg, "hi") || strings.Contains(msg, "hello") {
+				response = "你好！我是 ClawOps 数字员工 🤖\n\n我可以帮你：\n• 查询和管理部署实例\n• 创建数据库（MySQL/PostgreSQL）\n• 管理 Docker 容器\n• 查看系统状态和监控\n\n有什么可以帮你的吗？"
+				intent = "greeting"
+			} else if strings.Contains(msg, "部署") || strings.Contains(msg, "实例") {
+				if strings.Contains(msg, "创建") || strings.Contains(msg, "新建") {
+					response = "🎉 收到！创建部署实例\n\n请提供：\n1. 套餐：community / pro / enterprise\n2. 实例名称\n3. 域名（可选）"
+					intent = "create_deployment"
+				} else {
+					response = "📋 你的部署实例：\n\n1. 🟢 prod-api (pro) - 运行中\n2. 🟢 test-web (community) - 运行中\n3. 🔴 staging-db (pro) - 已停止\n\n输入"创建部署"可以开通新实例。"
+					intent = "list_deployments"
+				}
+			} else if strings.Contains(msg, "数据库") || strings.Contains(msg, "db") || strings.Contains(msg, "mysql") || strings.Contains(msg, "postgresql") {
+				if strings.Contains(msg, "创建") || strings.Contains(msg, "新建") {
+					response = "🗄️ 收到！创建数据库\n\n请提供：\n1. 类型：MySQL / PostgreSQL\n2. 版本\n3. 套餐：small / medium / large"
+					intent = "create_database"
+				} else {
+					response = "🗄️ 数据库实例：\n\n1. 🟢 mysql-prod (MySQL 8.0) - 4GB - 运行中\n2. 🟢 pg-main (PostgreSQL 14) - 8GB - 运行中\n\n输入"创建数据库"可以开通新数据库。"
+					intent = "list_databases"
+				}
+			} else if strings.Contains(msg, "docker") || strings.Contains(msg, "容器") {
+				if strings.Contains(msg, "创建") || strings.Contains(msg, "新建") {
+					response = "🐳 收到！部署 Docker 容器\n\n请提供：\n1. 镜像：nginx / redis / postgres 等\n2. 容器名称\n3. 套餐：small / medium / large"
+					intent = "create_docker"
+				} else {
+					response = "🐳 Docker 容器：\n\n1. 🟢 nginx-web (nginx:latest) - 端口 30000\n2. 🟢 redis-cache (redis:7) - 端口 30001\n\n输入"创建容器"可以部署新容器。"
+					intent = "list_docker"
+				}
+			} else if strings.Contains(msg, "状态") || strings.Contains(msg, "监控") {
+				response = "📊 系统状态\n\n状态：✅ 健康\n在线时间：99.9%\n\n资源概览：\n• 部署实例：2\n• 数据库：2\n• Docker 容器：2\n• CPU 使用：45%\n• 内存使用：38%"
+				intent = "system_status"
+			} else if strings.Contains(msg, "帮助") || strings.Contains(msg, "help") {
+				response = "📖 ClawOps 数字员工使用指南\n\n常用命令：\n• \"查看部署实例\" - 列出所有部署\n• \"创建一个 MySQL 数据库\" - 新建数据库\n• \"部署 Nginx 容器\" - 创建 Docker 容器\n• \"系统状态怎么样\" - 查看监控状态"
+				intent = "help"
+			} else {
+				response = fmt.Sprintf("🤔 我理解了你的意思，但需要更具体一点。\n\n你说的：\"%s\"\n\n我可以帮你管理部署、数据库和容器。请试试：\n• \"查看部署实例\"\n• \"创建一个 MySQL 数据库\"\n• \"部署 Nginx 容器\"", req.Message)
+				intent = "unknown"
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"id":         uuid.New().String(),
+				"session_id": sessionID,
+				"role":       "assistant",
+				"content":    response,
+				"intent":     intent,
+			})
+		})
+
+		api.GET("/ai/sessions", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"data": []gin.H{
+					{ID: uuid.New().String(), Title: "部署管理对话", LastMessage: "系统状态怎么样", UpdatedAt: time.Now()},
+					{ID: uuid.New().String(), Title: "数据库咨询", LastMessage: "创建一个 MySQL", UpdatedAt: time.Now().Add(-3600)},
+				},
+			})
+		})
+
+		api.GET("/ai/messages/:session_id", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"data": []gin.H{
+					{Role: "user", Content: "你好", CreatedAt: time.Now().Add(-7200)},
+					{Role: "assistant", Content: "你好！我是 ClawOps 数字员工", CreatedAt: time.Now().Add(-7199)},
+				},
+			})
 		})
 
 		api.POST("/monitor/alerts/:id/ack", func(c *gin.Context) {
