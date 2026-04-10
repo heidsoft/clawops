@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,6 +14,125 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
+// LLM 配置
+type LLMConfig struct {
+	Provider    string
+	APIKey      string
+	BaseURL     string
+	Model       string
+	Temperature float64
+}
+
+func getLLMConfig() LLMConfig {
+	provider := os.Getenv("LLM_PROVIDER")
+	if provider == "" {
+		provider = "openai"
+	}
+
+	baseURL := os.Getenv("LLM_BASE_URL")
+	if baseURL == "" {
+		if provider == "ollama" {
+			baseURL = "http://localhost:11434"
+		} else {
+			baseURL = "https://api.openai.com/v1"
+		}
+	}
+
+	model := os.Getenv("LLM_MODEL")
+	if model == "" {
+		if provider == "ollama" {
+			model = "llama3.2"
+		} else {
+			model = "gpt-4o-mini"
+		}
+	}
+
+	return LLMConfig{
+		Provider:    provider,
+		APIKey:      os.Getenv("OPENAI_API_KEY"),
+		BaseURL:     baseURL,
+		Model:       model,
+		Temperature: 0.7,
+	}
+}
+
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+func CallLLM(messages []ChatMessage, config LLMConfig) (string, error) {
+	llmMessages := []ChatMessage{
+		{Role: "system", Content: `你是一个专业的云运维助手，名叫 ClawOps 数字员工。
+
+## 你的能力
+- 查询和管理云资源（部署实例、数据库、容器）
+- 用中文回答，友好且专业
+- 支持工具调用来获取数据
+
+## 可用工具
+当用户询问信息时，返回真实的资源数据。
+
+## 回答风格
+- 使用 emoji 增加可读性
+- 信息结构化展示
+- 重要数据用粗体标注`},
+	}
+
+	for _, msg := range messages {
+		llmMessages = append(llmMessages, ChatMessage{Role: msg.Role, Content: msg.Content})
+	}
+
+	reqBody := map[string]interface{}{
+		"model":       config.Model,
+		"messages":    llmMessages,
+		"temperature": config.Temperature,
+	}
+
+	reqJSON, _ := json.Marshal(reqBody)
+
+	endpoint := config.BaseURL + "/chat/completions"
+
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(reqJSON))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	if config.APIKey != "" {
+		req.Header.Set("Authorization", "Bearer "+config.APIKey)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("LLM API error: %s", string(body))
+	}
+
+	var result map[string]interface{}
+	json.Unmarshal(body, &result)
+
+	choices, ok := result["choices"].([]interface{})
+	if ok && len(choices) > 0 {
+		choice := choices[0].(map[string]interface{})
+		if msg, ok := choice["message"].(map[string]interface{}); ok {
+			return msg["content"].(string), nil
+		}
+	}
+
+	return "", fmt.Errorf("no response content")
+}
 
 type Deployment struct {
 	ID           string                 `json:"id"`
@@ -339,12 +461,13 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{"alerts": []gin.H{}})
 		})
 
-		// 数字员工 AI 对话 APIs
+		// 数字员工 AI 对话 APIs (LLM 版本)
 		api.POST("/ai/chat", func(c *gin.Context) {
 			var req struct {
 				SessionID string `json:"session_id"`
 				UserID    string `json:"user_id"`
 				Message   string `json:"message" binding:"required"`
+				UseLLM    bool   `json:"use_llm"`
 			}
 			if err := c.ShouldBindJSON(&req); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -356,7 +479,34 @@ func main() {
 				sessionID = uuid.New().String()
 			}
 
-			// 模拟 AI 响应
+			// 如果启用 LLM
+			if req.UseLLM {
+				config := getLLMConfig()
+				messages := []ChatMessage{
+					{Role: "user", Content: req.Message},
+				}
+				resp, err := CallLLM(messages, config)
+				if err != nil {
+					c.JSON(http.StatusOK, gin.H{
+						"id":         uuid.New().String(),
+						"session_id": sessionID,
+						"role":       "assistant",
+						"content":    "抱歉，AI 服务暂时不可用。请稍后再试。\n\n错误：" + err.Error(),
+						"intent":     "error",
+					})
+					return
+				}
+				c.JSON(http.StatusOK, gin.H{
+					"id":         uuid.New().String(),
+					"session_id": sessionID,
+					"role":       "assistant",
+					"content":    resp,
+					"intent":     "llm",
+				})
+				return
+			}
+
+			// 规则引擎响应
 			intent := "general"
 			msg := strings.ToLower(req.Message)
 
@@ -369,7 +519,7 @@ func main() {
 					response = "🎉 收到！创建部署实例\n\n请提供：\n1. 套餐：community / pro / enterprise\n2. 实例名称\n3. 域名（可选）"
 					intent = "create_deployment"
 				} else {
-					response = "📋 你的部署实例：\n\n1. 🟢 prod-api (pro) - 运行中\n2. 🟢 test-web (community) - 运行中\n3. 🔴 staging-db (pro) - 已停止\n\n输入"创建部署"可以开通新实例。"
+					response = "📋 你的部署实例：\n\n1. 🟢 prod-api (pro) - 运行中\n2. 🟢 test-web (community) - 运行中\n3. 🔴 staging-db (pro) - 已停止\n\n输入「创建部署」可以开通新实例。"
 					intent = "list_deployments"
 				}
 			} else if strings.Contains(msg, "数据库") || strings.Contains(msg, "db") || strings.Contains(msg, "mysql") || strings.Contains(msg, "postgresql") {
@@ -377,7 +527,7 @@ func main() {
 					response = "🗄️ 收到！创建数据库\n\n请提供：\n1. 类型：MySQL / PostgreSQL\n2. 版本\n3. 套餐：small / medium / large"
 					intent = "create_database"
 				} else {
-					response = "🗄️ 数据库实例：\n\n1. 🟢 mysql-prod (MySQL 8.0) - 4GB - 运行中\n2. 🟢 pg-main (PostgreSQL 14) - 8GB - 运行中\n\n输入"创建数据库"可以开通新数据库。"
+					response = "🗄️ 数据库实例：\n\n1. 🟢 mysql-prod (MySQL 8.0) - 4GB - 运行中\n2. 🟢 pg-main (PostgreSQL 14) - 8GB - 运行中\n\n输入「创建数据库」可以开通新数据库。"
 					intent = "list_databases"
 				}
 			} else if strings.Contains(msg, "docker") || strings.Contains(msg, "容器") {
@@ -385,7 +535,7 @@ func main() {
 					response = "🐳 收到！部署 Docker 容器\n\n请提供：\n1. 镜像：nginx / redis / postgres 等\n2. 容器名称\n3. 套餐：small / medium / large"
 					intent = "create_docker"
 				} else {
-					response = "🐳 Docker 容器：\n\n1. 🟢 nginx-web (nginx:latest) - 端口 30000\n2. 🟢 redis-cache (redis:7) - 端口 30001\n\n输入"创建容器"可以部署新容器。"
+					response = "🐳 Docker 容器：\n\n1. 🟢 nginx-web (nginx:latest) - 端口 30000\n2. 🟢 redis-cache (redis:7) - 端口 30001\n\n输入「创建容器」可以部署新容器。"
 					intent = "list_docker"
 				}
 			} else if strings.Contains(msg, "状态") || strings.Contains(msg, "监控") {
