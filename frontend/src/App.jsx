@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } f
 import { deployService, userService } from './services/deploy';
 import Login from './pages/Login';
 import Deployments from './pages/Deployments';
+import Databases from './pages/Databases';
+import Docker from './pages/Docker';
 import Dashboard from './pages/Dashboard';
 import Monitoring from './pages/Monitoring';
 import Settings from './pages/Settings';
@@ -69,6 +71,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/deployments" element={<Deployments />} />
+              <Route path="/databases" element={<Databases />} />
+              <Route path="/docker" element={<Docker />} />
               <Route path="/monitoring" element={<Monitoring />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/" />} />
@@ -86,6 +90,8 @@ function Sidebar() {
   const menuItems = [
     { path: '/', icon: 'fa-home', text: '概览' },
     { path: '/deployments', icon: 'fa-server', text: '部署实例' },
+    { path: '/databases', icon: 'fa-database', text: '数据库' },
+    { path: '/docker', icon: 'fa-box', text: 'Docker容器' },
     { path: '/monitoring', icon: 'fa-chart-line', text: '监控告警' },
     { path: '/settings', icon: 'fa-cog', text: '系统设置' },
   ];

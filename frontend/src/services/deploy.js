@@ -144,4 +144,106 @@ export const monitorService = {
   },
 };
 
+// 数据库部署服务
+export const databaseService = {
+  // 获取数据库部署列表
+  getDatabases: async (page = 1, pageSize = 20) => {
+    const response = await apiClient.get('/databases', {
+      params: { page, page_size: pageSize },
+    });
+    return response;
+  },
+
+  // 获取数据库详情
+  getDatabase: async (id) => {
+    const response = await apiClient.get(`/databases/${id}`);
+    return response.data;
+  },
+
+  // 创建数据库部署
+  createDatabase: async (data) => {
+    const response = await apiClient.post('/databases', data);
+    return response.data;
+  },
+
+  // 删除数据库部署
+  deleteDatabase: async (id) => {
+    const response = await apiClient.delete(`/databases/${id}`);
+    return response.data;
+  },
+
+  // 获取备份列表
+  getDatabaseBackups: async (id) => {
+    const response = await apiClient.get(`/databases/${id}/backups`);
+    return response.data;
+  },
+
+  // 创建备份
+  createDatabaseBackup: async (id) => {
+    const response = await apiClient.post(`/databases/${id}/backups`);
+    return response.data;
+  },
+};
+
+// Docker 部署服务
+export const dockerService = {
+  // 获取 Docker 部署列表
+  getDockerDeployments: async (page = 1, pageSize = 20) => {
+    const response = await apiClient.get('/docker', {
+      params: { page, page_size: pageSize },
+    });
+    return response;
+  },
+
+  // 获取容器详情
+  getDockerDeployment: async (id) => {
+    const response = await apiClient.get(`/docker/${id}`);
+    return response.data;
+  },
+
+  // 创建 Docker 部署
+  createDocker: async (data) => {
+    const response = await apiClient.post('/docker', data);
+    return response.data;
+  },
+
+  // 启动容器
+  startDocker: async (id) => {
+    const response = await apiClient.post(`/docker/${id}/start`);
+    return response.data;
+  },
+
+  // 停止容器
+  stopDocker: async (id) => {
+    const response = await apiClient.post(`/docker/${id}/stop`);
+    return response.data;
+  },
+
+  // 删除容器
+  deleteDocker: async (id) => {
+    const response = await apiClient.delete(`/docker/${id}`);
+    return response.data;
+  },
+
+  // 获取容器日志
+  getDockerLogs: async (id, lines = 100) => {
+    const response = await apiClient.get(`/docker/${id}/logs`, {
+      params: { lines },
+    });
+    return response.data;
+  },
+
+  // 获取容器状态
+  getDockerStats: async (id) => {
+    const response = await apiClient.get(`/docker/${id}/stats`);
+    return response.data;
+  },
+
+  // 获取常用镜像列表
+  getDockerImages: async () => {
+    const response = await apiClient.get('/docker/images');
+    return response;
+  },
+};
+
 export default apiClient;

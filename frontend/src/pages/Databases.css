@@ -1,0 +1,70 @@
+.databases-page {
+  padding: 24px;
+}
+
+.databases-list {
+  display: grid;
+  gap: 16px;
+}
+
+.database-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.database-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.database-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.database-info h3 i {
+  color: #007bff;
+}
+
+.db-type {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.database-details {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.detail-item i {
+  width: 16px;
+  text-align: center;
+}
+
+.database-actions {
+  display: flex;
+  gap: 8px;
+}

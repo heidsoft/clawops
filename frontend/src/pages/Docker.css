@@ -1,0 +1,71 @@
+.docker-page {
+  padding: 24px;
+}
+
+.docker-list {
+  display: grid;
+  gap: 16px;
+}
+
+.docker-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.docker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.docker-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.docker-info h3 i {
+  color: #0d6efd;
+}
+
+.docker-image {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #0d6efd;
+  font-family: monospace;
+}
+
+.docker-details {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.docker-details .detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.docker-details .detail-item i {
+  width: 16px;
+  text-align: center;
+}
+
+.docker-actions {
+  display: flex;
+  gap: 8px;
+}
