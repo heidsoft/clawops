@@ -1,0 +1,60 @@
+run:
+  timeout: 5m
+  tests: true
+
+linter-settings:
+  gocyclo:
+    min-complexity: 15
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+  goconst:
+    min-len: 3
+    min-occurrences: 2
+  gocognit:
+    min-complexity: 20
+  misspell:
+    locale: US
+  lll:
+    line-length: 120
+
+linters:
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - structcheck
+    - varcheck
+    - ineffassign
+    - deadcode
+    - typecheck
+    - stylecheck
+    - gosec
+    - gocyclo
+    - goconst
+    - gocritic
+    - misspell
+    - lll
+    - unconvert
+    - prealloc
+    - exportloopref
+
+linters-disablE:
+  - lll
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+severity-rules:
+  disable:
+    - EXC0012
+    - EXC0014
