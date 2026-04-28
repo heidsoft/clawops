@@ -9,6 +9,8 @@ import AIAssistant from './pages/AIAssistant';
 import Dashboard from './pages/Dashboard';
 import Monitoring from './pages/Monitoring';
 import Skills from './pages/Skills';
+import Users from './pages/Users';
+import Audit from './pages/Audit';
 import Settings from './pages/Settings';
 import './App.css';
 
@@ -78,6 +80,8 @@ function App() {
               <Route path="/ai" element={<AIAssistant />} />
               <Route path="/monitoring" element={<Monitoring />} />
               <Route path="/skills" element={<Skills />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/audit" element={<Audit />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
@@ -99,6 +103,8 @@ function Sidebar() {
     { path: '/ai', icon: 'fa-robot', text: '数字员工' },
     { path: '/skills', icon: 'fa-plug', text: 'Skill市场' },
     { path: '/monitoring', icon: 'fa-chart-line', text: '监控告警' },
+    { path: '/users', icon: 'fa-users', text: '用户管理' },
+    { path: '/audit', icon: 'fa-history', text: '审计日志' },
     { path: '/settings', icon: 'fa-cog', text: '系统设置' },
   ];
 

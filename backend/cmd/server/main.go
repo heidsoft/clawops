@@ -640,7 +640,180 @@ func main() {
 			})
 		})
 
-		api.POST("/skills/install", func(c *gin.Context) {
+		// 企业版 APIs - 用户管理
+		api.POST("/auth/login", func(c *gin.Context) {
+			var req struct {
+				Username string `json:"username"`
+				Password string `json:"password"`
+			}
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+			if req.Username == "admin" && req.Password == "admin123" {
+				token := uuid.New().String()
+				c.JSON(http.StatusOK, gin.H{
+					"token": token,
+					"user": gin.H{
+						"id":       "user-admin",
+						"username": "admin",
+						"nickname": "管理员",
+						"email":    "admin@clawops.cn",
+						"role":     "super_admin",
+					},
+				})
+				return
+			}
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "用户名或密码错误"})
+		})
+
+		api.GET("/users/me", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"id":       "user-admin",
+				"username": "admin",
+				"nickname": "管理员",
+				"email":    "admin@clawops.cn",
+				"role":     "super_admin",
+				"tenant": gin.H{
+					"id":   "tenant-default",
+					"name": "默认租户",
+					"plan": "pro",
+				},
+			})
+		})
+
+		api.GET("/users", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"users": []gin.H{
+					{"id": "user-admin", "username": "admin", "nickname": "管理员", "email": "admin@clawops.cn", "role": "super_admin", "status": "active"},
+					{"id": "user-002", "username": "operator", "nickname": "运维人员", "email": "operator@clawops.cn", "role": "manager", "status": "active"},
+					{"id": "user-003", "username": "viewer", "nickname": "访客", "email": "viewer@clawops.cn", "role": "viewer", "status": "active"},
+				},
+				"total": 3,
+			})
+		})
+
+		api.POST("/users", func(c *gin.Context) {
+			c.JSON(http.StatusCreated, gin.H{
+				"user": gin.H{
+					"id":       uuid.New().String(),
+					"username": "newuser",
+					"role":     "user",
+					"status":   "active",
+				},
+				"message": "用户创建成功",
+			})
+		})
+
+		api.PUT("/users/:id", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "用户更新成功"})
+		})
+
+		api.DELETE("/users/:id", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "用户删除成功"})
+		})
+
+		// 审计日志
+		api.GET("/audit/logs", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"logs": []gin.H{
+					{"id": uuid.New().String(), "username": "admin", "action": "login", "resource": "session", "ip": "192.168.1.100", "status": "success", "created_at": time.Now().Add(-1 * time.Hour)},
+					{"id": uuid.New().String(), "username": "admin", "action": "create", "resource": "deployment", "resource_id": "dep-001", "ip": "192.168.1.100", "status": "success", "created_at": time.Now().Add(-2 * time.Hour)},
+					{"id": uuid.New().String(), "username": "operator", "action": "update", "resource": "monitor", "ip": "192.168.1.101", "status": "success", "created_at": time.Now().Add(-3 * time.Hour)},
+				},
+				"total": 3,
+			})
+		})
+
+		api.GET("/audit/stats", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"total_actions": 1256,
+				"today_actions":  45,
+				"week_actions":   312,
+			})
+		})
+
+		// API Token
+		api.GET("/api-tokens", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"tokens": []gin.H{
+					{"id": uuid.New().String(), "name": "CI/CD 集成", "scopes": "deploy:*", "status": "active", "created_at": time.Now().Add(-30 * 24 * time.Hour)},
+				},
+				"total": 1,
+			})
+		})
+
+		api.POST("/api-tokens", func(c *gin.Context) {
+			c.JSON(http.StatusCreated, gin.H{
+				"token": gin.H{
+					"id":      uuid.New().String(),
+					"name":    "新 Token",
+					"token":   uuid.New().String(),
+					"secret":  uuid.New().String(),
+					"status":  "active",
+				},
+				"message": "Token 创建成功，请妥善保管",
+			})
+		})
+
+		api.DELETE("/api-tokens/:id", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "Token 已撤销"})
+		})
+
+		// 角色
+		api.GET("/roles", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"roles": []gin.H{
+					{"id": "role-super-admin", "name": "超级管理员", "code": "super_admin", "is_system": true, "user_count": 1},
+					{"id": "role-admin", "name": "管理员", "code": "admin", "is_system": true, "user_count": 0},
+					{"id": "role-manager", "name": "运维经理", "code": "manager", "is_system": true, "user_count": 1},
+					{"id": "role-user", "name": "普通用户", "code": "user", "is_system": true, "user_count": 1},
+					{"id": "role-viewer", "name": "访客", "code": "viewer", "is_system": true, "user_count": 1},
+				},
+			})
+		})
+
+		// 租户
+		api.GET("/tenant", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"tenant": gin.H{
+					"id":   "tenant-default",
+					"name": "默认租户",
+					"plan": "pro",
+					"usage": gin.H{
+						"users":       4,
+						"deployments": 3,
+						"databases":   2,
+					},
+				},
+			})
+		})
+
+		// 菜单
+		api.GET("/menus", func(c *gin.Context) {
+			role := c.Query("role")
+			isAdmin := role == "super_admin" || role == "admin"
+			menus := []gin.H{
+				{"id": "dashboard", "name": "概览", "icon": "fa-home", "path": "/"},
+				{"id": "deployments", "name": "部署实例", "icon": "fa-server", "path": "/deployments"},
+				{"id": "databases", "name": "数据库", "icon": "fa-database", "path": "/databases"},
+				{"id": "docker", "name": "Docker容器", "icon": "fa-box", "path": "/docker"},
+				{"id": "ai", "name": "数字员工", "icon": "fa-robot", "path": "/ai"},
+				{"id": "skills", "name": "Skill市场", "icon": "fa-plug", "path": "/skills"},
+				{"id": "monitoring", "name": "监控告警", "icon": "fa-chart-line", "path": "/monitoring"},
+			}
+			if isAdmin {
+				adminMenus := []gin.H{
+					{"id": "users", "name": "用户管理", "icon": "fa-users", "path": "/users"},
+					{"id": "audit", "name": "审计日志", "icon": "fa-history", "path": "/audit"},
+					{"id": "settings", "name": "系统设置", "icon": "fa-cog", "path": "/settings"},
+				}
+				menus = append(menus, adminMenus...)
+			}
+			c.JSON(http.StatusOK, gin.H{"menus": menus})
+		})
+
+		// 数字员工 AI 对话 APIs (LLM 版本)
 			var req struct {
 				SkillID string `json:"skill_id"`
 				UserID  string `json:"user_id"`
