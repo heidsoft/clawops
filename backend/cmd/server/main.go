@@ -792,6 +792,32 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{"message": "Alert acknowledged"})
 		})
 
+		// 登录 API
+		api.POST("/auth/login", func(c *gin.Context) {
+			var req struct {
+				Username string `json:"username" binding:"required"`
+				Password string `json:"password" binding:"required"`
+			}
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "用户名和密码必填"})
+				return
+			}
+			// Mock 验证
+			if req.Username == "admin" && req.Password == "admin123" {
+				c.JSON(http.StatusOK, gin.H{
+					"token": "mock-jwt-token-" + uuid.New().String(),
+					"user": gin.H{
+						"id":       "user-admin",
+						"username": "admin",
+						"role":     "admin",
+						"email":    "admin@openclaw.cn",
+					},
+				})
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "用户名或密码错误"})
+			}
+		})
+
 		api.GET("/users/me", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"username": "admin", "role": "admin", "email": "admin@openclaw.cn"})
 		})
