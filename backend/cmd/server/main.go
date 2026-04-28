@@ -547,6 +547,122 @@ func main() {
 			})
 		})
 
+		// Skills 市场 APIs
+		api.GET("/skills", func(c *gin.Context) {
+			// 模拟 Skills 列表数据
+			category := c.Query("category")
+			search := c.Query("search")
+			page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+			pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
+
+			skills := []gin.H{
+				{"id": "skill-deploy", "name": "deploy", "version": "1.0.0", "description": "自动化部署技能", "author": "ClawOps Team", "category": "devops", "icon": "🚀", "stars": 128, "installs": 1024, "is_official": true},
+				{"id": "skill-monitor", "name": "monitor", "version": "1.0.0", "description": "监控告警技能", "author": "ClawOps Team", "category": "devops", "icon": "📊", "stars": 96, "installs": 856, "is_official": true},
+				{"id": "skill-backup", "name": "backup", "version": "1.0.0", "description": "备份恢复技能", "author": "ClawOps Team", "category": "devops", "icon": "💾", "stars": 72, "installs": 543, "is_official": true},
+				{"id": "skill-log", "name": "log", "version": "1.0.0", "description": "日志查询技能", "author": "ClawOps Team", "category": "devops", "icon": "📋", "stars": 65, "installs": 432, "is_official": true},
+				{"id": "skill-incident", "name": "incident", "version": "1.0.0", "description": "故障响应技能", "author": "ClawOps Team", "category": "devops", "icon": "🚨", "stars": 58, "installs": 321, "is_official": true},
+				{"id": "skill-k8s", "name": "kubernetes-deploy", "version": "1.0.0", "description": "K8s 部署技能", "author": "ClawOps Team", "category": "devops", "icon": "☸️", "stars": 89, "installs": 678, "is_official": true},
+				{"id": "skill-mysql", "name": "mysql-backup", "version": "1.0.0", "description": "MySQL 备份技能", "author": "ClawOps Team", "category": "database", "icon": "🐬", "stars": 54, "installs": 287, "is_official": true},
+				{"id": "skill-redis", "name": "redis-monitor", "version": "1.0.0", "description": "Redis 监控技能", "author": "ClawOps Team", "category": "database", "icon": "🔴", "stars": 47, "installs": 234, "is_official": true},
+				{"id": "skill-nginx", "name": "nginx-config", "version": "1.0.0", "description": "Nginx 配置技能", "author": "社区贡献", "category": "devops", "icon": "🌟", "stars": 43, "installs": 156, "is_official": false},
+				{"id": "skill-docker", "name": "docker-optimize", "version": "1.0.0", "description": "Docker 优化技能", "author": "社区贡献", "category": "devops", "icon": "🐳", "stars": 38, "installs": 123, "is_official": false},
+			}
+
+			// 过滤
+			if category != "" {
+				filtered := []gin.H{}
+				for _, s := range skills {
+					if s["category"] == category {
+						filtered = append(filtered, s)
+					}
+				}
+				skills = filtered
+			}
+
+			if search != "" {
+				filtered := []gin.H{}
+				for _, s := range skills {
+					name := s["name"].(string)
+					desc := s["description"].(string)
+					if strings.Contains(strings.ToLower(name), strings.ToLower(search)) || strings.Contains(strings.ToLower(desc), strings.ToLower(search)) {
+						filtered = append(filtered, s)
+					}
+				}
+				skills = filtered
+			}
+
+			categories := []gin.H{
+				{"id": "cat-devops", "name": "devops", "description": "运维自动化", "icon": "🛠️", "count": 6},
+				{"id": "cat-database", "name": "database", "description": "数据库管理", "icon": "🗄️", "count": 2},
+				{"id": "cat-security", "name": "security", "description": "安全合规", "icon": "🔒", "count": 0},
+				{"id": "cat-network", "name": "network", "description": "网络管理", "icon": "🌐", "count": 0},
+				{"id": "cat-development", "name": "development", "description": "开发工具", "icon": "💻", "count": 0},
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"skills":       skills,
+				"total":        len(skills),
+				"page":         page,
+				"page_size":    pageSize,
+				"total_pages":  1,
+				"categories":   categories,
+			})
+		})
+
+		api.GET("/skills/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			skill := gin.H{
+				"id":          id,
+				"name":        "deploy",
+				"version":     "1.0.0",
+				"description": "自动化部署技能 - 支持 Docker、K8s、VM 部署",
+				"author":      "ClawOps Team",
+				"category":    "devops",
+				"tags":        "devops,deployment,docker,kubernetes",
+				"icon":        "🚀",
+				"stars":       128,
+				"installs":    1024,
+				"is_official": true,
+				"readme":      "# Deploy Skill\n\n自动化部署服务，支持多种部署方式。\n\n## 支持平台\n- Docker Compose\n- Kubernetes\n- VM (SSH)\n\n## 使用示例\n```\n部署 nginx 到生产环境\n```",
+			}
+			c.JSON(http.StatusOK, gin.H{"skill": skill})
+		})
+
+		api.GET("/my-skills", func(c *gin.Context) {
+			// 用户已安装的 Skills
+			c.JSON(http.StatusOK, gin.H{
+				"user_skills": []gin.H{
+					{"id": "us-1", "skill_id": "skill-deploy", "skill_name": "deploy", "version": "1.0.0", "status": "active", "enabled": true},
+					{"id": "us-2", "skill_id": "skill-monitor", "skill_name": "monitor", "version": "1.0.0", "status": "active", "enabled": true},
+					{"id": "us-3", "skill_id": "skill-backup", "skill_name": "backup", "version": "1.0.0", "status": "active", "enabled": true},
+				},
+				"total": 3,
+			})
+		})
+
+		api.POST("/skills/install", func(c *gin.Context) {
+			var req struct {
+				SkillID string `json:"skill_id"`
+				UserID  string `json:"user_id"`
+			}
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{
+				"message":     "安装成功",
+				"user_skill": gin.H{"id": uuid.New().String(), "skill_id": req.SkillID, "status": "active"},
+			})
+		})
+
+		api.POST("/skills/:id/uninstall", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "卸载成功"})
+		})
+
+		api.POST("/skills/:id/star", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "点赞成功"})
+		})
+
 		// 数字员工 AI 对话 APIs (LLM 版本)
 		api.POST("/ai/chat", func(c *gin.Context) {
 			var req struct {

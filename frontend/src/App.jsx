@@ -8,6 +8,7 @@ import Docker from './pages/Docker';
 import AIAssistant from './pages/AIAssistant';
 import Dashboard from './pages/Dashboard';
 import Monitoring from './pages/Monitoring';
+import Skills from './pages/Skills';
 import Settings from './pages/Settings';
 import './App.css';
 
@@ -76,6 +77,7 @@ function App() {
               <Route path="/docker" element={<Docker />} />
               <Route path="/ai" element={<AIAssistant />} />
               <Route path="/monitoring" element={<Monitoring />} />
+              <Route path="/skills" element={<Skills />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
@@ -95,6 +97,7 @@ function Sidebar() {
     { path: '/databases', icon: 'fa-database', text: '数据库' },
     { path: '/docker', icon: 'fa-box', text: 'Docker容器' },
     { path: '/ai', icon: 'fa-robot', text: '数字员工' },
+    { path: '/skills', icon: 'fa-plug', text: 'Skill市场' },
     { path: '/monitoring', icon: 'fa-chart-line', text: '监控告警' },
     { path: '/settings', icon: 'fa-cog', text: '系统设置' },
   ];
