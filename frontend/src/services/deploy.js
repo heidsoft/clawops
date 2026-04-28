@@ -134,11 +134,11 @@ export const userService = {
 
   // 登录
   login: async (username, password) => {
-    const response = await apiClient.post('/auth/login', { username, password });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
+    const user = await apiClient.post('/auth/login', { username, password });
+    if (user.token) {
+      localStorage.setItem('token', user.token);
     }
-    return response.data;
+    return user;
   },
 
   // 登出
