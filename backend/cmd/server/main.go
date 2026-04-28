@@ -771,18 +771,35 @@ func main() {
 						"atMobiles": []string{},
 						"isAtAll":   false,
 					},
-					"email": gin.H{
-						"enabled":   false,
-						"smtp_host": "",
-						"smtp_port": 587,
-						"from":      "",
-						"to":        []string{},
-					},
-					"webhook": gin.H{
-						"enabled": false,
-						"url":     "",
-						"method":  "POST",
-					},
+				},
+			})
+		})
+
+		// 阿里云 ECS 配置
+		api.GET("/aliyun/instance-types", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"instance_types": []gin.H{
+					{"code": "ecs.n1.small", "name": "1核1G", "cpu": 1, "memory": 1024, "disk": 40, "price": 0.5},
+					{"code": "ecs.n1.medium", "name": "1核2G", "cpu": 1, "memory": 2048, "disk": 40, "price": 0.8},
+					{"code": "ecs.n2.small", "name": "2核2G", "cpu": 2, "memory": 2048, "disk": 40, "price": 1.0},
+					{"code": "ecs.n2.medium", "name": "2核4G", "cpu": 2, "memory": 4096, "disk": 40, "price": 1.5},
+					{"code": "ecs.n4.small", "name": "2核4G (n4)", "cpu": 2, "memory": 4096, "disk": 40, "price": 1.8},
+					{"code": "ecs.n4.medium", "name": "2核8G", "cpu": 2, "memory": 8192, "disk": 40, "price": 2.5},
+					{"code": "ecs.n4.large", "name": "4核8G", "cpu": 4, "memory": 8192, "disk": 40, "price": 3.5},
+					{"code": "ecs.n4.xlarge", "name": "4核16G", "cpu": 4, "memory": 16384, "disk": 40, "price": 5.0},
+				},
+				"regions": []gin.H{
+					{"id": "cn-beijing", "name": "华北 2 (北京)"},
+					{"id": "cn-shanghai", "name": "华东 1 (上海)"},
+					{"id": "cn-hangzhou", "name": "华东 2 (杭州)"},
+					{"id": "cn-guangzhou", "name": "华南 1 (广州)"},
+					{"id": "cn-shenzhen", "name": "华南 2 (深圳)"},
+				},
+				"images": []gin.H{
+					{"id": "ubuntu_22_04_x64", "name": "Ubuntu 22.04 LTS"},
+					{"id": "ubuntu_20_04_x64", "name": "Ubuntu 20.04 LTS"},
+					{"id": "centos_7_9", "name": "CentOS 7.9"},
+					{"id": "aliyun_2_1903", "name": "Alibaba Cloud Linux 2"},
 				},
 			})
 		})
