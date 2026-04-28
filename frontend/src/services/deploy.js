@@ -41,6 +41,30 @@ apiClient.interceptors.response.use(
 
 // 部署服务
 export const deployService = {
+  // 通用 GET 请求
+  get: async (path, params = {}) => {
+    const response = await apiClient.get(path, { params });
+    return response.data || response;
+  },
+
+  // 通用 POST 请求
+  post: async (path, data = {}) => {
+    const response = await apiClient.post(path, data);
+    return response.data || response;
+  },
+
+  // 通用 PUT 请求
+  put: async (path, data = {}) => {
+    const response = await apiClient.put(path, data);
+    return response.data || response;
+  },
+
+  // 通用 DELETE 请求
+  delete: async (path) => {
+    const response = await apiClient.delete(path);
+    return response.data || response;
+  },
+
   // 获取部署列表
   getDeployments: async (page = 1, pageSize = 20) => {
     const response = await apiClient.get('/deployments', {

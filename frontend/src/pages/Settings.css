@@ -1,0 +1,80 @@
+.settings-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.settings-container h1 {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.settings-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.settings-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.setting-item {
+  margin-bottom: 16px;
+}
+
+.setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.setting-item label {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.setting-item input[type="text"],
+.setting-item input[type="email"],
+.setting-item select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.setting-item input:disabled {
+  background: #f9fafb;
+  color: #999;
+}
+
+.setting-item input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.settings-actions {
+  text-align: right;
+}
+
+.btn-save {
+  padding: 10px 24px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-save:hover {
+  background: #4f46e5;
+}

@@ -458,7 +458,93 @@ func main() {
 		})
 
 		api.GET("/monitor/alerts", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{"alerts": []gin.H{}})
+			// 获取模拟告警数据
+			c.JSON(http.StatusOK, gin.H{
+				"alerts": []gin.H{
+					{
+						"id": uuid.New().String(),
+						"rule_name": "CPU 使用率过高",
+						"instance_name": "prod-001",
+						"severity": "warning",
+						"status": "firing",
+						"message": "CPU 使用率超过 80%，当前 85%",
+						"triggered_at": time.Now().Add(-30 * time.Minute),
+					},
+					{
+						"id": uuid.New().String(),
+						"rule_name": "内存使用率过高",
+						"instance_name": "prod-002",
+						"severity": "warning",
+						"status": "acknowledged",
+						"message": "内存使用率超过 85%，当前 87%",
+						"triggered_at": time.Now().Add(-2 * time.Hour),
+						"acknowledged_at": time.Now().Add(-1 * time.Hour),
+					},
+				},
+				"total": 2,
+			})
+		})
+
+		api.GET("/monitor/overview", func(c *gin.Context) {
+			// 监控概览
+			c.JSON(http.StatusOK, gin.H{
+				"overview": []gin.H{
+					{"instance_id": "i-001", "instance_name": "prod-001", "status": "running", "cpu": 45.5, "memory": 62.3, "disk": 45.2},
+					{"instance_id": "i-002", "instance_name": "prod-002", "status": "running", "cpu": 38.2, "memory": 55.8, "disk": 38.1},
+					{"instance_id": "i-003", "instance_name": "test-001", "status": "deploying", "cpu": 12.0, "memory": 25.0, "disk": 15.0},
+				},
+				"timestamp": time.Now(),
+			})
+		})
+
+		api.GET("/monitor/rules", func(c *gin.Context) {
+			// 告警规则列表
+			c.JSON(http.StatusOK, gin.H{
+				"rules": []gin.H{
+					{"id": "rule-1", "name": "CPU 使用率过高", "metric_type": "cpu", "threshold": 80, "severity": "warning", "enabled": true},
+					{"id": "rule-2", "name": "CPU 使用率严重", "metric_type": "cpu", "threshold": 95, "severity": "critical", "enabled": true},
+					{"id": "rule-3", "name": "内存使用率过高", "metric_type": "memory", "threshold": 85, "severity": "warning", "enabled": true},
+					{"id": "rule-4", "name": "磁盘使用率过高", "metric_type": "disk", "threshold": 90, "severity": "warning", "enabled": false},
+				},
+				"total": 4,
+			})
+		})
+
+		api.GET("/monitor/stats", func(c *gin.Context) {
+			// 告警统计
+			c.JSON(http.StatusOK, gin.H{
+				"total": 156,
+				"firing": 2,
+				"acknowledged": 5,
+				"resolved": 149,
+				"daily_stats": map[string]int{
+					"04-22": 12,
+					"04-23": 18,
+					"04-24": 8,
+					"04-25": 15,
+					"04-26": 22,
+					"04-27": 11,
+					"04-28": 5,
+				},
+				"timestamp": time.Now(),
+			})
+		})
+
+		api.GET("/monitor/alerts/:id", func(c *gin.Context) {
+			// 告警详情
+			c.JSON(http.StatusOK, gin.H{
+				"id": c.Param("id"),
+				"rule_name": "CPU 使用率过高",
+				"instance_name": "prod-001",
+				"severity": "warning",
+				"status": "firing",
+				"message": "CPU 使用率超过 80%，当前 85%",
+				"triggered_at": time.Now().Add(-30 * time.Minute),
+				"metric_data": gin.H{
+					"cpu_usage": 85.5,
+					"memory_usage": 62.3,
+				},
+			})
 		})
 
 		// 数字员工 AI 对话 APIs (LLM 版本)

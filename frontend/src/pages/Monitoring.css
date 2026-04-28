@@ -1,0 +1,393 @@
+.monitoring-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.monitoring-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.monitoring-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.btn-refresh {
+  padding: 8px 16px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-refresh:hover {
+  background: #4f46e5;
+}
+
+.monitoring-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: #666;
+  font-size: 18px;
+}
+
+/* 统计卡片 */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.stat-card.stat-firing {
+  border-left: 4px solid #ef4444;
+}
+
+.stat-card.stat-ack {
+  border-left: 4px solid #f59e0b;
+}
+
+.stat-card.stat-resolved {
+  border-left: 4px solid #22c55e;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #333;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* 主要内容区 */
+.monitoring-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* 实例面板 */
+.instances-panel,
+.alerts-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.instances-panel h2,
+.alerts-panel h2,
+.trend-panel h2 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.instances-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.instance-card {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.instance-card:hover {
+  border-color: #6366f1;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+}
+
+.instance-card.selected {
+  border-color: #6366f1;
+  background: #f5f3ff;
+}
+
+.instance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.instance-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.instance-status {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.instance-status.running {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.instance-status.deploying {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.instance-status.stopped {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.instance-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metric {
+  display: grid;
+  grid-template-columns: 50px 1fr 50px;
+  align-items: center;
+  gap: 8px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #666;
+}
+
+.metric-bar {
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.metric-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.metric-fill.cpu {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+
+.metric-fill.memory {
+  background: linear-gradient(90deg, #06b6d4, #22d3ee);
+}
+
+.metric-fill.disk {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.metric-value {
+  font-size: 12px;
+  color: #333;
+  text-align: right;
+}
+
+/* 告警面板 */
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.no-alerts {
+  text-align: center;
+  padding: 40px;
+  color: #22c55e;
+  font-size: 16px;
+}
+
+.alert-card {
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.alert-card.severity-critical {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+
+.alert-card.severity-warning {
+  background: #fefce8;
+  border-color: #f59e0b;
+}
+
+.alert-card.severity-info {
+  background: #f0f9ff;
+  border-color: #3b82f6;
+}
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.severity-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.severity-badge.critical {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.severity-badge.warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.status-badge.status-firing {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-badge.status-acknowledged {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge.status-resolved {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.alert-message {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.alert-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #666;
+}
+
+.alert-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-ack,
+.btn-resolve {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-ack {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.btn-resolve {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+/* 趋势图 */
+.trend-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.trend-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 150px;
+  padding-top: 20px;
+}
+
+.trend-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+}
+
+.trend-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.trend-bar-fill {
+  width: 40px;
+  background: linear-gradient(180deg, #6366f1, #a5b4fc);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+}
+
+.trend-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .monitoring-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+}
