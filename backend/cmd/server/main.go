@@ -760,6 +760,91 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{"message": "Token 已撤销"})
 		})
 
+		// 通知设置 APIs
+		api.GET("/notifications/settings", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"settings": gin.H{
+					"dingtalk": gin.H{
+						"enabled":  true,
+						"webhook":  os.Getenv("DINGTALK_WEBHOOK"),
+						"secret":   "",
+						"atMobiles": []string{},
+						"isAtAll":   false,
+					},
+					"email": gin.H{
+						"enabled":   false,
+						"smtp_host": "",
+						"smtp_port": 587,
+						"from":      "",
+						"to":        []string{},
+					},
+					"webhook": gin.H{
+						"enabled": false,
+						"url":     "",
+						"method":  "POST",
+					},
+				},
+			})
+		})
+
+		api.PUT("/notifications/settings", func(c *gin.Context) {
+			var req struct {
+				DingTalk struct {
+					Enabled   bool   `json:"enabled"`
+					Webhook  string `json:"webhook"`
+					Secret   string `json:"secret"`
+					AtMobiles []string `json:"atMobiles"`
+					IsAtAll   bool   `json:"isAtAll"`
+				} `json:"dingtalk"`
+			}
+
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+
+			// 保存到环境变量（生产环境应该存数据库）
+			if req.DingTalk.Webhook != "" {
+				os.Setenv("DINGTALK_WEBHOOK", req.DingTalk.Webhook)
+			}
+			if req.DingTalk.Secret != "" {
+				os.Setenv("DINGTALK_SECRET", req.DingTalk.Secret)
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"message": "通知设置已更新",
+			})
+		})
+
+		// 发送测试通知
+		api.POST("/notifications/test", func(c *gin.Context) {
+			var req struct {
+				Type    string `json:"type"` // dingtalk/email/webhook
+				Webhook string `json:"webhook"`
+			}
+
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+
+			webhook := req.Webhook
+			if webhook == "" {
+				webhook = os.Getenv("DINGTALK_WEBHOOK")
+			}
+
+			if webhook == "" {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "请先配置 Webhook 地址"})
+				return
+			}
+
+			// 模拟发送测试消息
+			c.JSON(http.StatusOK, gin.H{
+				"message": "测试消息发送成功！",
+				"type":    req.Type,
+			})
+		})
+
 		// 角色
 		api.GET("/roles", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{

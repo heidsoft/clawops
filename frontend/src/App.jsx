@@ -11,6 +11,7 @@ import Monitoring from './pages/Monitoring';
 import Skills from './pages/Skills';
 import Users from './pages/Users';
 import Audit from './pages/Audit';
+import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
 import './App.css';
 
@@ -82,6 +83,7 @@ function App() {
               <Route path="/skills" element={<Skills />} />
               <Route path="/users" element={<Users />} />
               <Route path="/audit" element={<Audit />} />
+              <Route path="/notifications" element={<Notifications />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
@@ -105,6 +107,7 @@ function Sidebar() {
     { path: '/monitoring', icon: 'fa-chart-line', text: '监控告警' },
     { path: '/users', icon: 'fa-users', text: '用户管理' },
     { path: '/audit', icon: 'fa-history', text: '审计日志' },
+    { path: '/notifications', icon: 'fa-bell', text: '通知设置' },
     { path: '/settings', icon: 'fa-cog', text: '系统设置' },
   ];
 
