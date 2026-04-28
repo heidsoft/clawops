@@ -9,6 +9,7 @@ type Config struct {
 	Database DatabaseConfig
 	Aliyun   AliyunConfig
 	JWT      JWTConfig
+	LLM     LLMConfig
 }
 
 type ServerConfig struct {
@@ -32,7 +33,34 @@ type JWTConfig struct {
 	Expire int
 }
 
+type LLMConfig struct {
+	Provider    string // openai / ollama
+	APIKey      string
+	BaseURL     string
+	Model       string
+	Temperature float64
+}
+
 func Load() *Config {
+	llmProvider := getEnv("LLM_PROVIDER", "openai")
+	llmBaseURL := getEnv("LLM_BASE_URL", "")
+	if llmBaseURL == "" {
+		if llmProvider == "ollama" {
+			llmBaseURL = "http://localhost:11434"
+		} else {
+			llmBaseURL = "https://api.openai.com/v1"
+		}
+	}
+	
+	llmModel := getEnv("LLM_MODEL", "")
+	if llmModel == "" {
+		if llmProvider == "ollama" {
+			llmModel = "llama3.2"
+		} else {
+			llmModel = "gpt-4o-mini"
+		}
+	}
+
 	return &Config{
 		Server: ServerConfig{
 			Port: getEnv("PORT", "8080"),
@@ -48,8 +76,15 @@ func Load() *Config {
 			SecurityGroupID: os.Getenv("SECURITY_GROUP_ID"),
 		},
 		JWT: JWTConfig{
-			Secret: getEnv("JWT_SECRET", "openclaw-deploy-secret-key"),
+			Secret: getEnv("JWT_SECRET", "clawops-secret-key"),
 			Expire: 24, // hours
+		},
+		LLM: LLMConfig{
+			Provider:    llmProvider,
+			APIKey:     os.Getenv("OPENAI_API_KEY"),
+			BaseURL:    llmBaseURL,
+			Model:     llmModel,
+			Temperature: 0.7,
 		},
 	}
 }

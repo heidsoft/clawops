@@ -479,8 +479,17 @@ func main() {
 				sessionID = uuid.New().String()
 			}
 
-			// 如果启用 LLM
-			if req.UseLLM {
+			// 如果启用 LLM (默认为 true)
+			useLLM := req.UseLLM
+			if !useLLM && req.UseLLM {
+				// 如果前端没有传 use_llm，默认尝试使用 LLM（如果有配置）
+				config := getLLMConfig()
+				if config.APIKey != "" || config.Provider == "ollama" {
+					useLLM = true
+				}
+			}
+
+			if useLLM {
 				config := getLLMConfig()
 				messages := []ChatMessage{
 					{Role: "user", Content: req.Message},

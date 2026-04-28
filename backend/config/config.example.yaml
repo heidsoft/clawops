@@ -1,0 +1,31 @@
+# ClawOps 配置文件
+
+# 服务器配置
+PORT=8080
+GIN_MODE=release
+
+# 数据库配置 (PostgreSQL)
+DB_DSN=host=localhost user=postgres password=your_password dbname=clawops port=5432 sslmode=disable
+
+# JWT 配置
+JWT_SECRET=your-secret-key-change-in-production
+
+# LLM 配置 - 选择 openai 或 ollama
+LLM_PROVIDER=openai  # 或 ollama
+
+# OpenAI 配置
+OPENAI_API_KEY=sk-your-key-here
+
+# Ollama 配置 (如果使用本地模型)
+# LLM_PROVIDER=ollama
+# LLM_BASE_URL=http://localhost:11434
+# LLM_MODEL=llama3.2
+
+# 阿里云配置 (可选，用于真实云资源操作)
+ALIYUN_ACCESS_KEY_ID=your-access-key-id
+ALIYUN_ACCESS_KEY_SECRET=your-access-key-secret
+ALIYUN_REGION_ID=cn-beijing
+SECURITY_GROUP_ID=sg-your-security-group-id
+
+# 钉钉通知 (可选)
+DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/send?access_token=your-token
