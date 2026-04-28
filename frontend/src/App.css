@@ -4,73 +4,144 @@
   --secondary: #764ba2;
   --sidebar-bg: #2c3e50;
   --sidebar-width: 240px;
+  --header-height: 60px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f7fa;
 }
 
-.app-layout {
+.app {
   display: flex;
   min-height: 100vh;
 }
 
+/* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
   background: var(--sidebar-bg);
   color: white;
-  padding: 1.5rem 0;
   position: fixed;
   height: 100vh;
   overflow-y: auto;
+  top: 0;
+  left: 0;
 }
 
-.sidebar-header {
-  padding: 0 1.5rem 1.5rem;
+.sidebar-brand {
+  padding: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: bold;
   border-bottom: 1px solid rgba(255,255,255,0.1);
-  margin-bottom: 1.5rem;
 }
 
-.sidebar-header h1 {
-  font-size: 1.5rem;
-  margin: 0;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.sidebar-brand i {
+  color: var(--primary);
+  margin-right: 0.5rem;
 }
 
-.nav-menu {
+.sidebar-menu {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.nav-item {
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  transition: background 0.2s;
+.sidebar-menu li a {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
-.nav-item:hover {
+.sidebar-menu li a:hover,
+.sidebar-menu li a.active {
   background: rgba(255,255,255,0.1);
+  color: white;
 }
 
-.nav-item.active {
-  background: var(--primary);
+.sidebar-menu li a i {
+  width: 24px;
+  margin-right: 0.75rem;
 }
 
+/* Main Content */
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header / Top Bar */
+.top-bar {
+  height: var(--header-height);
+  background: white;
+  border-bottom: 1px solid #e1e1e1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.top-bar h4 {
+  margin: 0;
+  color: #333;
+}
+
+.top-bar p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e1e1e1;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: #f5f5f5;
+}
+
+.btn-outline-secondary {
+  color: #666;
+}
+
+/* Content Area */
+.content {
+  flex: 1;
   padding: 2rem;
-  background: #f5f7fa;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 100vh;
 }
 
+.loading {
+  color: var(--primary);
+  font-size: 1.25rem;
+}
+
+/* Page Cards */
 .page-header {
   margin-bottom: 2rem;
 }
@@ -81,6 +152,84 @@ body {
 }
 
 .page-header p {
-  color: #666;
   margin: 0;
+  color: #666;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-running {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-deploying {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-stopped {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  
+  .sidebar-brand span,
+  .sidebar-menu li span {
+    display: none;
+  }
+  
+  .main-content {
+    margin-left: 60px;
+  }
 }

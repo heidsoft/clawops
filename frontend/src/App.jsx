@@ -40,8 +40,9 @@ function App() {
   };
 
   const handleLogin = async (username, password) => {
-    const user = await userService.login(username, password);
-    setCurrentUser(user);
+    const result = await userService.login(username, password);
+    // result = { token: "...", user: {id, username, role, email} }
+    setCurrentUser(result.user);
     setIsAuthenticated(true);
   };
 
