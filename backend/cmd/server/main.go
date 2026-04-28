@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -272,8 +273,8 @@ func main() {
 		api.GET("/databases", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": []gin.H{
-					{ID: uuid.New().String(), Name: "mysql-prod", DatabaseType: "mysql", Version: "8.0", Status: "running", Host: "47.52.xxx.xxx", Port: 3306, MemorySize: 4096, DiskSize: 100},
-					{ID: uuid.New().String(), Name: "pg-main", DatabaseType: "postgresql", Version: "14", Status: "running", Host: "47.52.xxx.xxx", Port: 5432, MemorySize: 8192, DiskSize: 200},
+					{"id": uuid.New().String(), "name": "mysql-prod", "database_type": "mysql", "version": "8.0", "status": "running", "host": "47.52.xxx.xxx", "port": 3306, "memory_size": 4096, "disk_size": 100},
+					{"id": uuid.New().String(), "name": "pg-main", "database_type": "postgresql", "version": "14", "status": "running", "host": "47.52.xxx.xxx", "port": 5432, "memory_size": 8192, "disk_size": 200},
 				},
 				"total": 2,
 				"page": 1,
@@ -294,16 +295,16 @@ func main() {
 				return
 			}
 			db := gin.H{
-				ID:           uuid.New().String(),
-				UserID:       req.UserID,
-				Name:         req.Name,
-				DatabaseType: req.DatabaseType,
-				Version:      req.Version,
-				Status:       "deploying",
-				Host:         "待分配",
-				Port:         3306,
-				MemorySize:   4096,
-				DiskSize:     40,
+				"id":            uuid.New().String(),
+				"user_id":       req.UserID,
+				"name":          req.Name,
+				"database_type": req.DatabaseType,
+				"version":       req.Version,
+				"status":        "deploying",
+				"host":          "待分配",
+				"port":          3306,
+				"memory_size":   4096,
+				"disk_size":     40,
 			}
 			c.JSON(http.StatusCreated, gin.H{"data": db, "message": "Database deployment created"})
 		})
@@ -311,16 +312,16 @@ func main() {
 		api.GET("/databases/:id", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{
-					ID:           c.Param("id"),
-					Name:         "mysql-prod",
-					DatabaseType: "mysql",
-					Version:      "8.0",
-					Status:       "running",
-					Host:         "47.52.xxx.xxx",
-					Port:         3306,
-					Username:     "root",
-					MemorySize:   4096,
-					DiskSize:     100,
+					"id":            c.Param("id"),
+					"name":          "mysql-prod",
+					"database_type": "mysql",
+					"version":       "8.0",
+					"status":        "running",
+					"host":          "47.52.xxx.xxx",
+					"port":          3306,
+					"username":      "root",
+					"memory_size":   4096,
+					"disk_size":     100,
 				},
 			})
 		})
@@ -332,23 +333,23 @@ func main() {
 		api.GET("/databases/:id/backups", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": []gin.H{
-					{ID: uuid.New().String(), BackupID: "backup-20260410080000", Size: "128MB", CreatedAt: "2026-04-10 08:00:00", Status: "completed"},
-					{ID: uuid.New().String(), BackupID: "backup-20260409080000", Size: "125MB", CreatedAt: "2026-04-09 08:00:00", Status: "completed"},
+					{"id": uuid.New().String(), "backup_id": "backup-20260410080000", "size": "128MB", "created_at": "2026-04-10 08:00:00", "status": "completed"},
+					{"id": uuid.New().String(), "backup_id": "backup-20260409080000", "size": "125MB", "created_at": "2026-04-09 08:00:00", "status": "completed"},
 				},
 			})
 		})
 
 		api.POST("/databases/:id/backups", func(c *gin.Context) {
-			c.JSON(http.StatusCreated, gin.H{"message": "Backup created", "data": gin.H{"ID": uuid.New().String(), Status: "creating"}})
+			c.JSON(http.StatusCreated, gin.H{"message": "Backup created", "data": gin.H{"id": uuid.New().String(), "status": "creating"}})
 		})
 
 		// Docker 部署 APIs
 		api.GET("/docker", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": []gin.H{
-					{ID: uuid.New().String(), Name: "nginx-web", Image: "nginx:latest", Status: "running", Host: "47.52.xxx.xxx", ExternalPort: 30000, CPU: 1, Memory: 1024},
-					{ID: uuid.New().String(), Name: "redis-cache", Image: "redis:7", Status: "running", Host: "47.52.xxx.xxx", ExternalPort: 30001, CPU: 1, Memory: 2048},
-					{ID: uuid.New().String(), Name: "grafana-monitor", Image: "grafana/grafana:latest", Status: "stopped", Host: "47.52.xxx.xxx", ExternalPort: 30002, CPU: 2, Memory: 4096},
+					{"id": uuid.New().String(), "name": "nginx-web", "image": "nginx:latest", "status": "running", "host": "47.52.xxx.xxx", "external_port": 30000, "cpu": 1, "memory": 1024},
+					{"id": uuid.New().String(), "name": "redis-cache", "image": "redis:7", "status": "running", "host": "47.52.xxx.xxx", "external_port": 30001, "cpu": 1, "memory": 2048},
+					{"id": uuid.New().String(), "name": "grafana-monitor", "image": "grafana/grafana:latest", "status": "stopped", "host": "47.52.xxx.xxx", "external_port": 30002, "cpu": 2, "memory": 4096},
 				},
 				"total": 3,
 				"page": 1,
@@ -372,15 +373,15 @@ func main() {
 				return
 			}
 			docker := gin.H{
-				ID:           uuid.New().String(),
-				UserID:       req.UserID,
-				Name:         req.Name,
-				Image:        req.Image,
-				Status:       "deploying",
-				Host:         "待分配",
-				ExternalPort: 30000,
-				CPU:          1,
-				Memory:       1024,
+				"id":            uuid.New().String(),
+				"user_id":       req.UserID,
+				"name":          req.Name,
+				"image":         req.Image,
+				"status":        "deploying",
+				"host":          "待分配",
+				"external_port": 30000,
+				"cpu":           1,
+				"memory":        1024,
 			}
 			c.JSON(http.StatusCreated, gin.H{"data": docker, "message": "Docker deployment created"})
 		})
@@ -388,15 +389,15 @@ func main() {
 		api.GET("/docker/:id", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{
-					ID:           c.Param("id"),
-					Name:         "nginx-web",
-					Image:        "nginx:latest",
-					Status:       "running",
-					Host:         "47.52.xxx.xxx",
-					ExternalPort: 30000,
-					CPU:          1,
-					Memory:       1024,
-					ContainerID:  "container-" + uuid.New().String()[:8],
+					"id":            c.Param("id"),
+					"name":          "nginx-web",
+					"image":         "nginx:latest",
+					"status":        "running",
+					"host":          "47.52.xxx.xxx",
+					"external_port": 30000,
+					"cpu":           1,
+					"memory":        1024,
+					"container_id":  "container-" + uuid.New().String()[:8],
 				},
 			})
 		})
@@ -416,9 +417,9 @@ func main() {
 		api.GET("/docker/:id/logs", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": []gin.H{
-					{Time: "2026-04-10 08:00:00", Level: "INFO", Message: "Container started"},
-					{Time: "2026-04-10 08:00:01", Level: "INFO", Message: "Application initialized"},
-					{Time: "2026-04-10 08:00:02", Level: "INFO", Message: "Listening on port 80"},
+					{"time": "2026-04-10 08:00:00", "level": "INFO", "message": "Container started"},
+					{"time": "2026-04-10 08:00:01", "level": "INFO", "message": "Application initialized"},
+					{"time": "2026-04-10 08:00:02", "level": "INFO", "message": "Listening on port 80"},
 				},
 			})
 		})
@@ -426,12 +427,12 @@ func main() {
 		api.GET("/docker/:id/stats", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{
-					CPU:        45.5,
-					Memory:     262144,
-					NetworkRX:  10485760,
-					NetworkTX:  524288,
-					DiskRead:   104857600,
-					DiskWrite:  52428800,
+					"cpu":        45.5,
+					"memory":     262144,
+					"network_rx":  10485760,
+					"network_tx":  524288,
+					"disk_read":   104857600,
+					"disk_write":  52428800,
 				},
 			})
 		})
@@ -439,16 +440,16 @@ func main() {
 		api.GET("/docker/images", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": []gin.H{
-					{Name: "nginx", Description: "Web 服务器", Size: "142MB"},
-					{Name: "redis", Description: "缓存数据库", Size: "130MB"},
-					{Name: "postgres", Description: "PostgreSQL 数据库", Size: "373MB"},
-					{Name: "mysql", Description: "MySQL 数据库", Size: "516MB"},
-					{Name: "mongo", Description: "MongoDB 数据库", Size: "700MB"},
-					{Name: "node", Description: "Node.js 运行时", Size: "1.1GB"},
-					{Name: "python", Description: "Python 运行时", Size: "3.5GB"},
-					{Name: "grafana", Description: "监控可视化", Size: "325MB"},
-					{Name: "prometheus", Description: "监控时序数据库", Size: "188MB"},
-					{Name: "minio", Description: "对象存储", Size: "365MB"},
+					{"name": "nginx", "description": "Web 服务器", "size": "142MB"},
+					{"name": "redis", "description": "缓存数据库", "size": "130MB"},
+					{"name": "postgres", "description": "PostgreSQL 数据库", "size": "373MB"},
+					{"name": "mysql", "description": "MySQL 数据库", "size": "516MB"},
+					{"name": "mongo", "description": "MongoDB 数据库", "size": "700MB"},
+					{"name": "node", "description": "Node.js 运行时", "size": "1.1GB"},
+					{"name": "python", "description": "Python 运行时", "size": "3.5GB"},
+					{"name": "grafana", "description": "监控可视化", "size": "325MB"},
+					{"name": "prometheus", "description": "监控时序数据库", "size": "188MB"},
+					{"name": "minio", "description": "对象存储", "size": "365MB"},
 				},
 			})
 		})
@@ -640,282 +641,7 @@ func main() {
 			})
 		})
 
-		// 企业版 APIs - 用户管理
-		api.POST("/auth/login", func(c *gin.Context) {
-			var req struct {
-				Username string `json:"username"`
-				Password string `json:"password"`
-			}
-			if err := c.ShouldBindJSON(&req); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-			if req.Username == "admin" && req.Password == "admin123" {
-				token := uuid.New().String()
-				c.JSON(http.StatusOK, gin.H{
-					"token": token,
-					"user": gin.H{
-						"id":       "user-admin",
-						"username": "admin",
-						"nickname": "管理员",
-						"email":    "admin@clawops.cn",
-						"role":     "super_admin",
-					},
-				})
-				return
-			}
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "用户名或密码错误"})
-		})
-
-		api.GET("/users/me", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"id":       "user-admin",
-				"username": "admin",
-				"nickname": "管理员",
-				"email":    "admin@clawops.cn",
-				"role":     "super_admin",
-				"tenant": gin.H{
-					"id":   "tenant-default",
-					"name": "默认租户",
-					"plan": "pro",
-				},
-			})
-		})
-
-		api.GET("/users", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"users": []gin.H{
-					{"id": "user-admin", "username": "admin", "nickname": "管理员", "email": "admin@clawops.cn", "role": "super_admin", "status": "active"},
-					{"id": "user-002", "username": "operator", "nickname": "运维人员", "email": "operator@clawops.cn", "role": "manager", "status": "active"},
-					{"id": "user-003", "username": "viewer", "nickname": "访客", "email": "viewer@clawops.cn", "role": "viewer", "status": "active"},
-				},
-				"total": 3,
-			})
-		})
-
-		api.POST("/users", func(c *gin.Context) {
-			c.JSON(http.StatusCreated, gin.H{
-				"user": gin.H{
-					"id":       uuid.New().String(),
-					"username": "newuser",
-					"role":     "user",
-					"status":   "active",
-				},
-				"message": "用户创建成功",
-			})
-		})
-
-		api.PUT("/users/:id", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{"message": "用户更新成功"})
-		})
-
-		api.DELETE("/users/:id", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{"message": "用户删除成功"})
-		})
-
-		// 审计日志
-		api.GET("/audit/logs", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"logs": []gin.H{
-					{"id": uuid.New().String(), "username": "admin", "action": "login", "resource": "session", "ip": "192.168.1.100", "status": "success", "created_at": time.Now().Add(-1 * time.Hour)},
-					{"id": uuid.New().String(), "username": "admin", "action": "create", "resource": "deployment", "resource_id": "dep-001", "ip": "192.168.1.100", "status": "success", "created_at": time.Now().Add(-2 * time.Hour)},
-					{"id": uuid.New().String(), "username": "operator", "action": "update", "resource": "monitor", "ip": "192.168.1.101", "status": "success", "created_at": time.Now().Add(-3 * time.Hour)},
-				},
-				"total": 3,
-			})
-		})
-
-		api.GET("/audit/stats", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"total_actions": 1256,
-				"today_actions":  45,
-				"week_actions":   312,
-			})
-		})
-
-		// API Token
-		api.GET("/api-tokens", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"tokens": []gin.H{
-					{"id": uuid.New().String(), "name": "CI/CD 集成", "scopes": "deploy:*", "status": "active", "created_at": time.Now().Add(-30 * 24 * time.Hour)},
-				},
-				"total": 1,
-			})
-		})
-
-		api.POST("/api-tokens", func(c *gin.Context) {
-			c.JSON(http.StatusCreated, gin.H{
-				"token": gin.H{
-					"id":      uuid.New().String(),
-					"name":    "新 Token",
-					"token":   uuid.New().String(),
-					"secret":  uuid.New().String(),
-					"status":  "active",
-				},
-				"message": "Token 创建成功，请妥善保管",
-			})
-		})
-
-		api.DELETE("/api-tokens/:id", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{"message": "Token 已撤销"})
-		})
-
-		// 通知设置 APIs
-		api.GET("/notifications/settings", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"settings": gin.H{
-					"dingtalk": gin.H{
-						"enabled":  true,
-						"webhook":  os.Getenv("DINGTALK_WEBHOOK"),
-						"secret":   "",
-						"atMobiles": []string{},
-						"isAtAll":   false,
-					},
-				},
-			})
-		})
-
-		// 阿里云 ECS 配置
-		api.GET("/aliyun/instance-types", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"instance_types": []gin.H{
-					{"code": "ecs.n1.small", "name": "1核1G", "cpu": 1, "memory": 1024, "disk": 40, "price": 0.5},
-					{"code": "ecs.n1.medium", "name": "1核2G", "cpu": 1, "memory": 2048, "disk": 40, "price": 0.8},
-					{"code": "ecs.n2.small", "name": "2核2G", "cpu": 2, "memory": 2048, "disk": 40, "price": 1.0},
-					{"code": "ecs.n2.medium", "name": "2核4G", "cpu": 2, "memory": 4096, "disk": 40, "price": 1.5},
-					{"code": "ecs.n4.small", "name": "2核4G (n4)", "cpu": 2, "memory": 4096, "disk": 40, "price": 1.8},
-					{"code": "ecs.n4.medium", "name": "2核8G", "cpu": 2, "memory": 8192, "disk": 40, "price": 2.5},
-					{"code": "ecs.n4.large", "name": "4核8G", "cpu": 4, "memory": 8192, "disk": 40, "price": 3.5},
-					{"code": "ecs.n4.xlarge", "name": "4核16G", "cpu": 4, "memory": 16384, "disk": 40, "price": 5.0},
-				},
-				"regions": []gin.H{
-					{"id": "cn-beijing", "name": "华北 2 (北京)"},
-					{"id": "cn-shanghai", "name": "华东 1 (上海)"},
-					{"id": "cn-hangzhou", "name": "华东 2 (杭州)"},
-					{"id": "cn-guangzhou", "name": "华南 1 (广州)"},
-					{"id": "cn-shenzhen", "name": "华南 2 (深圳)"},
-				},
-				"images": []gin.H{
-					{"id": "ubuntu_22_04_x64", "name": "Ubuntu 22.04 LTS"},
-					{"id": "ubuntu_20_04_x64", "name": "Ubuntu 20.04 LTS"},
-					{"id": "centos_7_9", "name": "CentOS 7.9"},
-					{"id": "aliyun_2_1903", "name": "Alibaba Cloud Linux 2"},
-				},
-			})
-		})
-
-		api.PUT("/notifications/settings", func(c *gin.Context) {
-			var req struct {
-				DingTalk struct {
-					Enabled   bool   `json:"enabled"`
-					Webhook  string `json:"webhook"`
-					Secret   string `json:"secret"`
-					AtMobiles []string `json:"atMobiles"`
-					IsAtAll   bool   `json:"isAtAll"`
-				} `json:"dingtalk"`
-			}
-
-			if err := c.ShouldBindJSON(&req); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-
-			// 保存到环境变量（生产环境应该存数据库）
-			if req.DingTalk.Webhook != "" {
-				os.Setenv("DINGTALK_WEBHOOK", req.DingTalk.Webhook)
-			}
-			if req.DingTalk.Secret != "" {
-				os.Setenv("DINGTALK_SECRET", req.DingTalk.Secret)
-			}
-
-			c.JSON(http.StatusOK, gin.H{
-				"message": "通知设置已更新",
-			})
-		})
-
-		// 发送测试通知
-		api.POST("/notifications/test", func(c *gin.Context) {
-			var req struct {
-				Type    string `json:"type"` // dingtalk/email/webhook
-				Webhook string `json:"webhook"`
-			}
-
-			if err := c.ShouldBindJSON(&req); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-
-			webhook := req.Webhook
-			if webhook == "" {
-				webhook = os.Getenv("DINGTALK_WEBHOOK")
-			}
-
-			if webhook == "" {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "请先配置 Webhook 地址"})
-				return
-			}
-
-			// 模拟发送测试消息
-			c.JSON(http.StatusOK, gin.H{
-				"message": "测试消息发送成功！",
-				"type":    req.Type,
-			})
-		})
-
-		// 角色
-		api.GET("/roles", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"roles": []gin.H{
-					{"id": "role-super-admin", "name": "超级管理员", "code": "super_admin", "is_system": true, "user_count": 1},
-					{"id": "role-admin", "name": "管理员", "code": "admin", "is_system": true, "user_count": 0},
-					{"id": "role-manager", "name": "运维经理", "code": "manager", "is_system": true, "user_count": 1},
-					{"id": "role-user", "name": "普通用户", "code": "user", "is_system": true, "user_count": 1},
-					{"id": "role-viewer", "name": "访客", "code": "viewer", "is_system": true, "user_count": 1},
-				},
-			})
-		})
-
-		// 租户
-		api.GET("/tenant", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"tenant": gin.H{
-					"id":   "tenant-default",
-					"name": "默认租户",
-					"plan": "pro",
-					"usage": gin.H{
-						"users":       4,
-						"deployments": 3,
-						"databases":   2,
-					},
-				},
-			})
-		})
-
-		// 菜单
-		api.GET("/menus", func(c *gin.Context) {
-			role := c.Query("role")
-			isAdmin := role == "super_admin" || role == "admin"
-			menus := []gin.H{
-				{"id": "dashboard", "name": "概览", "icon": "fa-home", "path": "/"},
-				{"id": "deployments", "name": "部署实例", "icon": "fa-server", "path": "/deployments"},
-				{"id": "databases", "name": "数据库", "icon": "fa-database", "path": "/databases"},
-				{"id": "docker", "name": "Docker容器", "icon": "fa-box", "path": "/docker"},
-				{"id": "ai", "name": "数字员工", "icon": "fa-robot", "path": "/ai"},
-				{"id": "skills", "name": "Skill市场", "icon": "fa-plug", "path": "/skills"},
-				{"id": "monitoring", "name": "监控告警", "icon": "fa-chart-line", "path": "/monitoring"},
-			}
-			if isAdmin {
-				adminMenus := []gin.H{
-					{"id": "users", "name": "用户管理", "icon": "fa-users", "path": "/users"},
-					{"id": "audit", "name": "审计日志", "icon": "fa-history", "path": "/audit"},
-					{"id": "settings", "name": "系统设置", "icon": "fa-cog", "path": "/settings"},
-				}
-				menus = append(menus, adminMenus...)
-			}
-			c.JSON(http.StatusOK, gin.H{"menus": menus})
-		})
-
-		// 数字员工 AI 对话 APIs (LLM 版本)
+		api.POST("/skills/install", func(c *gin.Context) {
 			var req struct {
 				SkillID string `json:"skill_id"`
 				UserID  string `json:"user_id"`
@@ -1047,8 +773,8 @@ func main() {
 		api.GET("/ai/sessions", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": []gin.H{
-					{ID: uuid.New().String(), Title: "部署管理对话", LastMessage: "系统状态怎么样", UpdatedAt: time.Now()},
-					{ID: uuid.New().String(), Title: "数据库咨询", LastMessage: "创建一个 MySQL", UpdatedAt: time.Now().Add(-3600)},
+					{"id": uuid.New().String(), "title": "部署管理对话", "last_message": "系统状态怎么样", "updated_at": time.Now()},
+					{"id": uuid.New().String(), "title": "数据库咨询", "last_message": "创建一个 MySQL", "updated_at": time.Now().Add(-3600)},
 				},
 			})
 		})
@@ -1056,8 +782,8 @@ func main() {
 		api.GET("/ai/messages/:session_id", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"data": []gin.H{
-					{Role: "user", Content: "你好", CreatedAt: time.Now().Add(-7200)},
-					{Role: "assistant", Content: "你好！我是 ClawOps 数字员工", CreatedAt: time.Now().Add(-7199)},
+					{"role": "user", "content": "你好", "created_at": time.Now().Add(-7200)},
+					{"role": "assistant", "content": "你好！我是 ClawOps 数字员工", "created_at": time.Now().Add(-7199)},
 				},
 			})
 		})
