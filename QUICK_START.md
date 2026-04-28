@@ -1,125 +1,173 @@
-# OpenClaw 部署管理系统 - 快速开始
+# ClawOps 快速开始
 
-## 🚀 后端启动
+## 环境要求
+
+- **Go**: 1.21+
+- **Node.js**: 18+
+- **PostgreSQL**: 14+
+- **可选**: Ollama (本地 LLM) 或 OpenAI API
+
+---
+
+## 1. 克隆项目
 
 ```bash
-cd openclaw-deploy/backend
+git clone https://github.com/heidsoft/clawops.git
+cd clawops
+```
 
-# 安装 Go 依赖
+## 2. 启动 PostgreSQL
+
+```bash
+# 使用 Docker
+docker run -d \
+  --name clawops-db \
+  -e POSTGRES_DB=clawops \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=your-password \
+  -p 5432:5432 \
+  postgres:15
+```
+
+## 3. 配置后端
+
+```bash
+cd backend
+
+# 复制配置模板
+cp config/config.example.yaml config/config.yaml
+
+# 编辑配置
+vim config/config.yaml
+```
+
+关键配置项：
+
+```yaml
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: your-password  # 修改这里
+  dbname: clawops
+
+llm:
+  provider: openai        # 或 ollama
+  api_key: your-api-key
+  base_url: https://api.openai.com/v1
+
+cloud:
+  aliyun:
+    access_key: your-access-key
+    secret_key: your-secret-key
+    region: cn-beijing
+```
+
+## 4. 启动后端
+
+```bash
+cd backend
 go mod download
-
-# 启动服务
 go run cmd/server/main.go
 ```
 
-服务将在 http://localhost:8080 启动
+后端启动后会：
+- 自动创建数据库表
+- 监听 `http://localhost:8080`
 
-### API 测试
+## 5. 启动前端
 
-```bash
-# 获取部署列表
-curl http://localhost:8080/api/v1/deployments
-
-# 创建部署
-curl -X POST http://localhost:8080/api/v1/deployments \
-  -H "Content-Type: application/json" \
-  -d '{"user_id":"u001","plan":"pro","instance_name":"test-001"}'
-
-# 获取监控数据
-curl http://localhost:8080/api/v1/deployments/1/metrics
-```
-
----
-
-## ⚛️ 前端启动
+新开一个终端窗口：
 
 ```bash
-cd openclaw-deploy/frontend
-
-# 安装依赖
+cd frontend
 npm install
-
-# 启动开发服务器
 npm run dev
 ```
 
-前端将在 http://localhost:5173 启动
+前端启动后会：
+- 访问 `http://localhost:3000`
+- 自动代理 API 到后端 `:8080`
 
----
+## 6. 开始使用
 
-## 📖 API 文档
+1. 打开浏览器访问 http://localhost:3000
+2. 注册/登录账号
+3. 在 AI 对话框输入指令：
 
-### 部署管理
+### 示例指令
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /api/v1/deployments | 获取部署列表 |
-| POST | /api/v1/deployments | 创建部署 |
-| GET | /api/v1/deployments/:id | 获取部署详情 |
-| POST | /api/v1/deployments/:id/start | 启动部署 |
-| POST | /api/v1/deployments/:id/stop | 停止部署 |
-| GET | /api/v1/deployments/:id/metrics | 获取监控数据 |
+**部署服务：**
+```
+部署一个 nginx 到阿里云
+```
 
-### 监控告警
+**查看部署：**
+```
+列出我所有的部署
+```
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /api/v1/monitor/system | 系统状态 |
-| GET | /api/v1/monitor/alerts | 告警列表 |
+**监控告警：**
+```
+查看服务器状态
+```
 
-### 用户管理
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /api/v1/users/me | 当前用户 |
-
----
-
-## 🔧 配置
-
-### 环境变量（.env）
-
-```bash
-# 服务器配置
-PORT=8080
-GIN_MODE=release
-
-# 阿里云配置
-ALIYUN_ACCESS_KEY_ID=your_access_key_id
-ALIYUN_ACCESS_KEY_SECRET=your_access_key_secret
-ALIYUN_REGION_ID=cn-shanghai
-SECURITY_GROUP_ID=sg-xxx
-
-# 数据库配置
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=password
-DB_NAME=openclaw_deploy
-
-# JWT 配置
-JWT_SECRET=your_jwt_secret
+**故障排查：**
+```
+网站打不开了，帮我看看什么问题
 ```
 
 ---
 
-## 📊 功能状态
+## 本地 LLM 模式 (可选)
 
-### 已完成
-- ✅ 项目架构
-- ✅ 后端主程序
-- ✅ 部署管理 API（Mock）
-- ✅ React 主应用
-- ✅ 部署管理页面
+如果你想完全离线使用：
 
-### 待完成
-- [ ] 阿里云 ECS 集成
-- [ ] 数据库集成
-- [ ] 用户认证
-- [ ] 真实监控数据
-- [ ] 域名管理
-- [ ] 自动化部署流程
+```bash
+# 1. 安装 Ollama
+brew install ollama  # macOS
+# 或: curl -fsSL https://ollama.com/install.sh | sh  # Linux
+
+# 2. 下载模型
+ollama pull llama3:8b
+
+# 3. 启动 Ollama
+ollama serve
+
+# 4. 修改 backend/config/config.yaml
+llm:
+  provider: ollama
+  base_url: http://localhost:11434
+  model: llama3:8b
+```
 
 ---
 
-**开发中... 敬请期待！** 🚀
+## 常见问题
+
+### Q: 数据库连接失败？
+
+```bash
+# 检查 PostgreSQL 是否运行
+docker ps | grep postgres
+
+# 如果没运行，启动它
+docker start clawops-db
+```
+
+### Q: 前端无法连接后端？
+
+检查后端是否运行在 `:8080`，并确认 `frontend/vite.config.js` 的代理配置正确。
+
+### Q: LLM API 报错？
+
+- OpenAI: 确认 `api_key` 正确
+- Ollama: 确认 `ollama serve` 已启动
+
+---
+
+## 下一步
+
+- 📖 查看 [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md) 了解开发规范
+- 🗺️ 查看 [ROADMAP.md](ROADMAP.md) 了解产品路线图
+- 🔌 查看 [harness/skills/](harness/skills/) 学习 Skill 开发
